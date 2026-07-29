@@ -235,12 +235,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }
 
-  // --- NAVIGATION TAB HANDLING ---
+  // --- NAVIGATION TAB HANDLING & ADMIN ROUTING ---
   function setupNavigation() {
-    brandHomeBtn.addEventListener('click', () => switchTab('agreement'));
-    navAgreementBtn.addEventListener('click', () => switchTab('agreement'));
-    navRideBtn.addEventListener('click', () => switchTab('ride'));
-    navAdminBtn.addEventListener('click', () => switchTab('admin'));
+    if (brandHomeBtn) brandHomeBtn.addEventListener('click', () => switchTab('agreement'));
+    if (navAgreementBtn) navAgreementBtn.addEventListener('click', () => switchTab('agreement'));
+    if (navRideBtn) navRideBtn.addEventListener('click', () => switchTab('ride'));
+    if (navAdminBtn) navAdminBtn.addEventListener('click', () => switchTab('admin'));
+
+    // Check if URL has ?mode=admin or #admin parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const isAdminMode = urlParams.get('mode') === 'admin' || window.location.hash === '#admin';
+
+    if (isAdminMode) {
+      if (navAdminBtn) navAdminBtn.style.display = 'flex';
+      switchTab('admin');
+    } else {
+      if (navAdminBtn) navAdminBtn.style.display = 'none';
+      switchTab('agreement');
+    }
   }
 
   function switchTab(tabName) {
