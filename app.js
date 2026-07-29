@@ -95,31 +95,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Dynamic text preview on typing
-    inputPlatDk.addEventListener('input', (e) => {
-      const val = e.target.value.trim().toUpperCase() || '[Plat Motor]';
-      previewPlatDisplay.textContent = val;
-      summaryPlat.textContent = val;
-    });
+    if (inputPlatDk) {
+      inputPlatDk.addEventListener('input', (e) => {
+        const val = e.target.value.trim().toUpperCase() || '[Plat Motor]';
+        if (previewPlatDisplay) previewPlatDisplay.textContent = val;
+        if (summaryPlat) summaryPlat.textContent = val;
+        validateFormState();
+      });
+    }
 
-    inputRentDays.addEventListener('change', (e) => {
-      const days = e.target.value;
-      summaryDays.textContent = `${days} Hari (${days * 24} Jam)`;
-    });
+    if (inputCustName) inputCustName.addEventListener('input', validateFormState);
+    if (inputCustPhone) inputCustPhone.addEventListener('input', validateFormState);
 
-    // Checkbox agreement validation
-    agreeTncCheckbox.addEventListener('change', (e) => {
-      btnSubmitAgreement.disabled = !e.target.checked;
-    });
+    if (inputRentDays) {
+      inputRentDays.addEventListener('change', (e) => {
+        const days = e.target.value;
+        if (summaryDays) summaryDays.textContent = `${days} Hari (${days * 24} Jam)`;
+        validateFormState();
+      });
+    }
+
+    if (agreeTncCheckbox) {
+      agreeTncCheckbox.addEventListener('change', validateFormState);
+    }
+
+    function validateFormState() {
+      const isNameFilled = inputCustName && inputCustName.value.trim().length > 0;
+      const isPhoneFilled = inputCustPhone && inputCustPhone.value.trim().length > 0;
+      const isPlatFilled = inputPlatDk && inputPlatDk.value.trim().length > 0;
+      const isChecked = agreeTncCheckbox && agreeTncCheckbox.checked;
+
+      if (btnSubmitAgreement) {
+        if (isChecked && isNameFilled && isPhoneFilled && isPlatFilled) {
+          btnSubmitAgreement.style.boxShadow = '0 0 25px rgba(0, 242, 254, 0.7)';
+          btnSubmitAgreement.style.opacity = '1';
+        } else {
+          btnSubmitAgreement.style.boxShadow = '0 4px 15px rgba(0, 242, 254, 0.3)';
+          btnSubmitAgreement.style.opacity = '0.9';
+        }
+      }
+    }
 
     // Form Submission
     serviceForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const name = inputCustName.value.trim();
-      const phone = inputCustPhone.value.trim();
-      const plat = inputPlatDk.value.trim().toUpperCase();
-      const days = parseInt(inputRentDays.value, 10);
-      const startDateVal = inputStartDate.value;
+      const name = inputCustName ? inputCustName.value.trim() : '';
+      const phone = inputCustPhone ? inputCustPhone.value.trim() : '';
+      const plat = inputPlatDk ? inputPlatDk.value.trim().toUpperCase() : '';
+      const days = inputRentDays ? parseInt(inputRentDays.value, 10) : 1;
+      const startDateVal = inputStartDate ? inputStartDate.value : '';
+
+      // Clear interactive feedback checks
+      if (!name) {
+        alert('⚠️ Harap isi Nama Lengkap Penyewa terlebih dahulu.');
+        if (inputCustName) inputCustName.focus();
+        return;
+      }
+      if (!phone) {
+        alert('⚠️ Harap isi Nomor WhatsApp / HP Penyewa.');
+        if (inputCustPhone) inputCustPhone.focus();
+        return;
+      }
+      if (!plat) {
+        alert('⚠️ Harap isi Nomor Plat Motor (Contoh: DK 4829 SKS).');
+        if (inputPlatDk) inputPlatDk.focus();
+        return;
+      }
+      if (!agreeTncCheckbox || !agreeTncCheckbox.checked) {
+        alert('⚠️ Harap centang kotak persetujuan Syarat & Ketentuan pelacakan lokasi SOS terlebih dahulu.');
+        if (agreeTncCheckbox) agreeTncCheckbox.focus();
+        return;
+      }
 
       state.activeAgreement.customerName = name;
       state.activeAgreement.phone = phone;
@@ -131,13 +178,15 @@ document.addEventListener('DOMContentLoaded', () => {
       state.activeAgreement.expiryTime = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
 
       // Update customer ride header
-      rideCustTitle.textContent = `${name} - Plat Motor (${plat})`;
+      if (rideCustTitle) rideCustTitle.textContent = `${name} - Plat ${plat}`;
       
       // Update fleet entry #1 for admin
-      state.fleetList[0].name = name;
-      state.fleetList[0].plat = plat;
-      state.fleetList[0].days = `${days} Hari`;
-      state.fleetList[0].phone = phone;
+      if (state.fleetList[0]) {
+        state.fleetList[0].name = name;
+        state.fleetList[0].plat = plat;
+        state.fleetList[0].days = `${days} Hari`;
+        state.fleetList[0].phone = phone;
+      }
 
       // Save to InsForge Database
       if (window.InsForgeClient) {
@@ -153,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       startCountdownTimer();
 
-      alert(`✅ Persetujuan Layanan Berhasil Disimpan!\n\nData tersimpan ke InsForge Database. Sistem pelacakan GPS lokasi real-time & fitur SOS darurat aktif untuk motor Plat ${plat} selama ${days} Hari.`);
+      alert(`🎉 PERSETUJUAN BERHASIL DISIMPAN!\n\nSistem pelacakan GPS lokasi real-time & fitur SOS darurat aktif untuk motor Plat ${plat} (${days} Hari).\nData tersimpan di InsForge Database.`);
       
       switchTab('ride');
     });
