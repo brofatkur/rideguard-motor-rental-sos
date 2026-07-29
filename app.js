@@ -256,20 +256,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function switchTab(tabName) {
-    [navAgreementBtn, navRideBtn, navAdminBtn].forEach(b => b.classList.remove('active'));
-    [viewAgreement, viewRide, viewAdmin].forEach(v => v.classList.remove('active'));
+    [navAgreementBtn, navRideBtn, navAdminBtn].forEach(b => { if (b) b.classList.remove('active'); });
+    [viewAgreement, viewRide, viewAdmin].forEach(v => { if (v) v.classList.remove('active'); });
 
     if (tabName === 'agreement') {
-      navAgreementBtn.classList.add('active');
-      viewAgreement.classList.add('active');
+      if (navAgreementBtn) navAgreementBtn.classList.add('active');
+      if (viewAgreement) viewAgreement.classList.add('active');
     } else if (tabName === 'ride') {
-      navRideBtn.classList.add('active');
-      viewRide.classList.add('active');
-      ensureCustomerMap();
+      if (navRideBtn) navRideBtn.classList.add('active');
+      if (viewRide) viewRide.classList.add('active');
+      
+      // Delay briefly to allow DOM display rendering before initializing Leaflet
+      setTimeout(() => {
+        ensureCustomerMap();
+        if (customerMap) customerMap.invalidateSize();
+      }, 150);
     } else if (tabName === 'admin') {
-      navAdminBtn.classList.add('active');
-      viewAdmin.classList.add('active');
-      ensureAdminMap();
+      if (navAdminBtn) navAdminBtn.classList.add('active');
+      if (viewAdmin) viewAdmin.classList.add('active');
+      
+      setTimeout(() => {
+        ensureAdminMap();
+        if (adminMap) adminMap.invalidateSize();
+      }, 150);
       renderFleetList();
     }
   }
@@ -277,28 +286,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- LEAFLET MAPS & GEOLOCATION ---
   function initGeolocation() {
     if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
+      navigator.geolocation.watchPosition(
         (pos) => {
           state.activeAgreement.coords.lat = pos.coords.latitude;
           state.activeAgreement.coords.lng = pos.coords.longitude;
+          if (pos.coords.speed) {
+            state.activeAgreement.speed = Math.round(pos.coords.speed * 3.6);
+            if (currentSpeedEl) currentSpeedEl.textContent = `${state.activeAgreement.speed} km/h`;
+          }
           updateCustomerMapPosition();
         },
         (err) => {
           console.log('GPS browser access default to simulated coords:', err.message);
         },
-        { enableHighAccuracy: true }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
   }
 
   function ensureCustomerMap() {
+    const mapElement = document.getElementById('customer-map');
+    if (!mapElement) return;
+
     if (customerMap) {
       customerMap.invalidateSize();
       return;
     }
 
     const { lat, lng } = state.activeAgreement.coords;
-    customerMap = L.map('customer-map').setView([lat, lng], 15);
+    customerMap = L.map('customer-map', {
+      zoomControl: true,
+      touchZoom: true
+    }).setView([lat, lng], 15);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -307,24 +326,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bikeIcon = L.divIcon({
       className: 'custom-bike-marker',
-      html: `<div style="background:#00f2fe; color:#0a0f1d; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 15px #00f2fe; border:3px solid #fff;">
-               <i class="fa-solid fa-motorcycle" style="font-size:16px;"></i>
+      html: `<div style="background:#00f2fe; color:#0a0f1d; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 15px #00f2fe; border:3px solid #fff;">
+               <i class="fa-solid fa-motorcycle" style="font-size:18px;"></i>
              </div>`,
-      iconSize: [36, 36],
-      iconAnchor: [18, 18]
+      iconSize: [38, 38],
+      iconAnchor: [19, 19]
     });
 
     customerMarker = L.marker([lat, lng], { icon: bikeIcon }).addTo(customerMap)
       .bindPopup(`<b>Motor Plat ${state.activeAgreement.platDk}</b><br>GPS Active & Terhubung SOS 24/7`)
       .openPopup();
 
-    // Recenter map listener
-    recenterMapBtn.addEventListener('click', () => {
-      customerMap.setView([state.activeAgreement.coords.lat, state.activeAgreement.coords.lng], 16);
-    });
+    if (recenterMapBtn) {
+      recenterMapBtn.addEventListener('click', () => {
+        customerMap.setView([state.activeAgreement.coords.lat, state.activeAgreement.coords.lng], 16);
+      });
+    }
 
-    // Toggle simulation listener
-    toggleSimMovementBtn.addEventListener('click', toggleSimulation);
+    if (toggleSimMovementBtn) {
+      toggleSimMovementBtn.addEventListener('click', toggleSimulation);
+    }
+
+    // Auto start movement simulation so map is live immediately!
+    startAutoSimulation();
+  }
+
+  function startAutoSimulation() {
+    if (!state.isSimulating) {
+      toggleSimulation();
+    }
   }
 
   function updateCustomerMapPosition() {
