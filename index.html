@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RideGuard - Persetujuan Layanan & Lacak Lokasi Sewa Motor</title>
+  <meta name="description" content="Halaman Persetujuan Layanan Sewa Sepeda Motor dengan Pelacakan GPS Realtime & Sistem Keselamatan SOS.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet CSS for Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo" id="brand-home-btn">
+        <i class="fa-solid fa-shield-halved brand-icon"></i>
+        <div class="brand-text">
+          <span class="brand-name">RideGuard</span>
+          <span class="brand-tagline">Persetujuan Layanan & Safety SOS</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button id="nav-agreement-btn" class="nav-btn active"><i class="fa-solid fa-file-contract"></i> Persetujuan Layanan</button>
+        <button id="nav-ride-btn" class="nav-btn"><i class="fa-solid fa-location-arrow"></i> Status Lacak & SOS</button>
+        <button id="nav-admin-btn" class="nav-btn admin-badge"><i class="fa-solid fa-tower-observation"></i> Admin Tracking HQ</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    
+    <!-- VIEW 1: HALAMAN PERSETUJUAN LAYANAN SEWA MOTOR -->
+    <section id="view-agreement" class="view-section active">
+      <div class="agreement-hero">
+        <div class="hero-text">
+          <span class="hero-badge"><i class="fa-solid fa-shield-heart"></i> Perlindungan Keselamatan Penyewa</span>
+          <h1>Form Persetujuan Layanan & Pelacakan GPS Sewa Motor</h1>
+          <p>Silakan isi data motor disewa dan setujui Syarat & Ketentuan pelacakan lokasi demi keamanan serta bantuan darurat SOS selama masa sewa.</p>
+        </div>
+      </div>
+
+      <div class="agreement-container-grid">
+        <!-- Form Data Motor & Durasi Sewa -->
+        <div class="form-card-box">
+          <div class="card-title-bar">
+            <i class="fa-solid fa-id-card-clip title-icon"></i>
+            <div>
+              <h3>Data Sewa Motor & Penyewa</h3>
+              <p>Isi informasi motor yang disewa dan lama durasi sewa Anda.</p>
+            </div>
+          </div>
+
+          <form id="service-agreement-form" class="agreement-form">
+            <div class="form-group">
+              <label for="input-cust-name"><i class="fa-solid fa-user"></i> Nama Lengkap Penyewa</label>
+              <input type="text" id="input-cust-name" placeholder="Contoh: Budi Santoso" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="input-cust-phone"><i class="fa-solid fa-phone"></i> Nomor WhatsApp / HP</label>
+                <input type="tel" id="input-cust-phone" placeholder="081234567890" required>
+              </div>
+              <div class="form-group">
+                <label for="input-plat-dk"><i class="fa-solid fa-motorcycle"></i> Nomor Plat Motor (DK / B)</label>
+                <input type="text" id="input-plat-dk" placeholder="Contoh: DK 4829 SKS" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="input-start-date"><i class="fa-solid fa-calendar-day"></i> Tanggal Mulai Sewa</label>
+                <input type="date" id="input-start-date" required>
+              </div>
+              <div class="form-group">
+                <label for="input-rent-days"><i class="fa-solid fa-hourglass-half"></i> Rentang Sewa (Jumlah Hari)</label>
+                <select id="input-rent-days">
+                  <option value="1">1 Hari (24 Jam)</option>
+                  <option value="2">2 Hari (48 Jam)</option>
+                  <option value="3">3 Hari (72 Jam)</option>
+                  <option value="5">5 Hari</option>
+                  <option value="7">1 Minggu (7 Hari)</option>
+                  <option value="14">2 Minggu (14 Hari)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Syarat & Ketentuan GPS Box -->
+            <div class="tnc-terms-box">
+              <div class="tnc-box-header">
+                <i class="fa-solid fa-shield-cat tnc-icon-badge"></i>
+                <h4>Syarat & Ketentuan Pelacakan GPS Real-time & Fitur SOS</h4>
+              </div>
+              
+              <div class="tnc-scroll-body">
+                <div class="tnc-point">
+                  <strong><i class="fa-solid fa-location-dot"></i> 1. Pelacakan Lokasi Selama Masa Sewa:</strong>
+                  <p>Perangkat pelacak GPS aktif melacak lokasi sepeda motor dengan Plat <span class="highlight-plate" id="preview-plat-display">[Plat Motor]</span> secara real-time selama rentang masa sewa yang Anda daftarkan.</p>
+                </div>
+
+                <div class="tnc-point">
+                  <strong><i class="fa-solid fa-triangle-exclamation"></i> 2. Bantuan Darurat (SOS Panic Button):</strong>
+                  <p>Fitur SOS darurat dapat Anda gunakan kapan saja jika mengalami kendala kecelakaan, kerusakan di area sepi, atau ancaman bahaya. Sinyal dan koordinat posisi akan langsung terhubung ke Tim Patroli RideGuard.</p>
+                </div>
+
+                <div class="tnc-point">
+                  <strong><i class="fa-solid fa-lock"></i> 3. Kerahasiaan & Penonaktifan Otomatis:</strong>
+                  <p>Data lokasi Anda tersimpan secara aman dan terenkripsi. Sesuai ketentuan, sistem pelacakan akan <strong>otomatis berhenti dan dihapus</strong> segera setelah durasi sewa berakhir.</p>
+                </div>
+              </div>
+
+              <!-- Mandatory Consent Checkbox -->
+              <div class="tnc-consent-check">
+                <label class="custom-checkbox-label">
+                  <input type="checkbox" id="agree-tnc-checkbox" required>
+                  <span class="checkmark"></span>
+                  <span class="label-text">
+                    <strong>Saya menyetujui Syarat & Ketentuan Layanan di atas</strong>, termasuk pengaktifan pelacakan GPS real-time demi keselamatan dan bantuan darurat SOS selama durasi sewa.
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" id="btn-submit-agreement" class="btn-primary-lg" disabled>
+              <i class="fa-solid fa-shield-check"></i> Setujui Layanan & Aktifkan Lacak Lokasi SOS
+            </button>
+          </form>
+        </div>
+
+        <!-- Info Sidebar Card -->
+        <div class="info-sidebar-box">
+          <div class="safety-features-card">
+            <i class="fa-solid fa-headset safety-icon"></i>
+            <h3>Mengapa Pelacakan GPS Penting?</h3>
+            <ul>
+              <li><i class="fa-solid fa-circle-check"></i> Respon Cepat saat Terjadi Kecelakaan atau Mogok</li>
+              <li><i class="fa-solid fa-circle-check"></i> Bantuan Tim Patroli 24/7 di Seluruh Area</li>
+              <li><i class="fa-solid fa-circle-check"></i> Privasi Terjaga & Lacak Otomatis Off Saat Sewa Selesai</li>
+            </ul>
+          </div>
+
+          <div class="active-summary-preview">
+            <h4><i class="fa-solid fa-clock-rotate-left"></i> Ringkasan Durasi Lacak</h4>
+            <div class="summary-line"><span>Motor:</span> <strong id="summary-plat">Belum diisi</strong></div>
+            <div class="summary-line"><span>Masa Lacak:</span> <strong id="summary-days">1 Hari (24 Jam)</strong></div>
+            <div class="summary-line"><span>Status GPS:</span> <span class="badge-status-ready">Ready to Activate</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: CUSTOMER RIDE & SOS DASHBOARD -->
+    <section id="view-ride" class="view-section">
+      <div class="ride-header">
+        <div class="ride-info-card">
+          <div class="bike-status-badge active"><i class="fa-solid fa-signal"></i> GPS Live Tracking Aktif</div>
+          <h2 id="ride-cust-title">Budi Santoso - Plat Motor (DK 4829 SKS)</h2>
+          <p class="ride-period"><i class="fa-regular fa-clock"></i> Masa Sewa Aktif: <span id="ride-timer-display">Sisa 23 Jam 59 Menit</span></p>
+        </div>
+
+        <div class="ride-stats-grid">
+          <div class="stat-box">
+            <i class="fa-solid fa-gauge-high stat-icon"></i>
+            <div class="stat-detail">
+              <span class="stat-value" id="current-speed">0 km/h</span>
+              <span class="stat-label">Kecepatan Realtime</span>
+            </div>
+          </div>
+          <div class="stat-box">
+            <i class="fa-solid fa-battery-three-quarters stat-icon"></i>
+            <div class="stat-detail">
+              <span class="stat-value" id="tracker-battery">96%</span>
+              <span class="stat-label">Baterai Tracker GPS</span>
+            </div>
+          </div>
+          <div class="stat-box">
+            <i class="fa-solid fa-map-pin stat-icon"></i>
+            <div class="stat-detail">
+              <span class="stat-value" id="gps-coords">-8.6500, 115.2166</span>
+              <span class="stat-label">Koordinat GPS Lat/Lng</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map & Emergency SOS Panel -->
+      <div class="ride-content-grid">
+        <div class="map-container-box">
+          <div class="map-header">
+            <h3><i class="fa-solid fa-map-location-dot"></i> Peta Lokasi Sepeda Motor Anda (Real-time)</h3>
+            <div class="map-actions">
+              <button id="recenter-map-btn" class="btn-secondary btn-sm"><i class="fa-solid fa-crosshairs"></i> Recenter GPS</button>
+              <button id="toggle-sim-movement" class="btn-secondary btn-sm"><i class="fa-solid fa-play"></i> Simulasi Perjalanan</button>
+            </div>
+          </div>
+          <div id="customer-map" class="map-element"></div>
+        </div>
+
+        <!-- Panic SOS Button Card -->
+        <div class="sos-panel-card">
+          <div class="sos-header">
+            <i class="fa-solid fa-triangle-exclamation sos-warning-icon"></i>
+            <h3>Tombol Darurat (SOS Panic Button)</h3>
+            <p>Tekan tombol di bawah jika Anda berada dalam bahaya, mengalami kecelakaan, atau kendala di area sepi. Sinyal SOS & koordinat lokasi motor akan langsung terkirim ke Tim Respon Cepat.</p>
+          </div>
+
+          <div class="sos-button-wrapper">
+            <button id="trigger-sos-btn" class="sos-pulse-btn">
+              <span class="sos-text">SOS</span>
+              <span class="sos-subtext">TEKAN DALAM BAHAYA</span>
+            </button>
+          </div>
+
+          <div class="sos-status-box" id="sos-status-box">
+            <div class="status-indicator normal"></div>
+            <span id="sos-status-text">Status: Aman & Terhubung ke Tim Patroli</span>
+          </div>
+
+          <div class="emergency-contacts">
+            <h4><i class="fa-solid fa-phone-volume"></i> Hotline Darurat 24 Jam</h4>
+            <a href="tel:080014045" class="contact-pill"><i class="fa-solid fa-headset"></i> Tim Patroli: 0800-140-45</a>
+            <a href="tel:110" class="contact-pill emergency"><i class="fa-solid fa-building-shield"></i> Polisi (110) / Ambulans (118)</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: ADMIN / PATROLI TRACKING HQ -->
+    <section id="view-admin" class="view-section">
+      <div class="admin-header">
+        <div>
+          <h2><i class="fa-solid fa-tower-observation"></i> Fleet Tracking HQ & SOS Emergency Response</h2>
+          <p>Pemantauan posisi motor berdasarkan Plat Nomor (DK) dan status durasi sewa aktif.</p>
+        </div>
+        <div class="admin-summary-tags">
+          <span class="summary-tag active-tag"><i class="fa-solid fa-motorcycle"></i> <strong id="admin-active-count">3</strong> Motor Terlacak</span>
+          <span class="summary-tag sos-tag" id="admin-sos-tag"><i class="fa-solid fa-bell-slash"></i> 0 SOS Active</span>
+        </div>
+      </div>
+
+      <!-- Live SOS Alert Banner -->
+      <div id="admin-sos-alert-banner" class="admin-sos-alert-banner hidden">
+        <div class="alert-pulse-beacon"></div>
+        <div class="alert-content">
+          <div class="alert-title">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>PERINGATAN SOS DARURAT DITERIMA!</span>
+          </div>
+          <p id="alert-details-text">Pelanggan Budi Santoso (Plat DK 4829 SKS) menekan Tombol SOS!</p>
+        </div>
+        <div class="alert-actions">
+          <button id="admin-dispatch-team-btn" class="btn-danger"><i class="fa-solid fa-truck-medical"></i> Kirim Tim Respon SOS</button>
+          <button id="admin-call-cust-btn" class="btn-warning"><i class="fa-solid fa-phone"></i> Hubungi Penyewa</button>
+          <button id="admin-resolve-sos-btn" class="btn-success"><i class="fa-solid fa-check"></i> Selesaikan Incident</button>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <!-- Fleet Map -->
+        <div class="admin-map-card">
+          <div class="card-title">
+            <h3><i class="fa-solid fa-earth-southeast"></i> Peta Posisi Motor Terlacak (Real-time)</h3>
+            <span class="live-dot">LIVE</span>
+          </div>
+          <div id="admin-map" class="map-element"></div>
+        </div>
+
+        <!-- Active Rentals List -->
+        <div class="admin-fleet-card">
+          <div class="card-title">
+            <h3><i class="fa-solid fa-list-check"></i> Daftar Motor & Durasi Sewa Aktif</h3>
+          </div>
+          <div class="fleet-list" id="fleet-list-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SOS ALARM OVERLAY FOR CUSTOMER -->
+  <div id="sos-active-overlay" class="sos-active-overlay hidden">
+    <div class="overlay-card">
+      <div class="warning-beacon-circle">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h2>SINYAL SOS TERKIRIM!</h2>
+      <p class="overlay-msg">Koordinat lokasi presisi motor Anda telah diterima oleh Tim Respon Cepat RideGuard.</p>
+      
+      <div class="dispatch-status-box">
+        <div class="pulse-loader"></div>
+        <span>Tim Respon Cepat sedang menuju lokasi Anda / Menghubungi HP Anda...</span>
+      </div>
+
+      <div class="location-summary-badge">
+        <i class="fa-solid fa-location-crosshairs"></i> Posisi GPS: <span id="sos-sent-coords">-8.6500, 115.2166</span>
+      </div>
+
+      <div class="overlay-buttons">
+        <a href="tel:080014045" class="btn-call-emergency"><i class="fa-solid fa-phone"></i> Hubungi Tim Patroli Sekarang</a>
+        <button id="cancel-sos-btn" class="btn-cancel-alert"><i class="fa-solid fa-xmark"></i> Batalkan SOS (Salah Tekan)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS for Maps -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- InsForge Database Client Module -->
+  <script src="insforge.js"></script>
+  <!-- Application Logic JS -->
+  <script src="app.js"></script>
+</body>
+</html>

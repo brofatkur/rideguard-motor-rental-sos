@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "rideguard-motor-rental-sos",
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}
